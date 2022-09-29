@@ -1,0 +1,20 @@
+ИНСТРУКЦИЯ:
+
+https://habr.com/ru/post/442800/
+
+ОТ БАТИ БОТА:
+
+Done! Congratulations on your new bot. You will find it at t.me/test_pock_career_bot. You can now add a description, about section and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you do this.
+
+Use this token to access the HTTP API:
+5541011348:AAHypj-j6hueFOl2tnMM-ldz5ZkPm2E8Xgc
+Keep your token secure and store it safely, it can be used by anyone to control your bot.
+
+For a description of the Bot API, see this page: https://core.telegram.org/bots/api
+
+ССЫЛКИ
+
+https://stackoverflow.com/questions/50521031/how-to-get-the-users-name-in-telegram-bot
+Telebot Doc - https://pypi.org/project/pyTelegramBotAPI/
+https://pynative.com/python-sqlite-insert-into-table/#h-using-python-variables-in-sqlite-insert-query
+https://stackoverflow.com/questions/63299057/telegram-bot-push-users-to-use-buttons-if-a-user-uses-test-message
