@@ -5,6 +5,7 @@ from telebot import types
 import datetime, time
 import os
 
+#КОММЕНТ ОТ ЛЕРЫ
 
 # Start bot
 bot_token = os.environ['BOT_TOKEN']
