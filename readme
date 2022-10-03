@@ -1,3 +1,9 @@
+ЭТАПЫ:
+
+- выдать задачу дня из CSV
+- проверить ответ и записать данные в БД: date, id, correct/incorrect, start_time, end_time, duration
+- по команде выдавать статистику: количество верных ответов, доля верных, среднее время на решение
+
 ИНСТРУКЦИЯ:
 
 https://habr.com/ru/post/442800/
@@ -14,3 +20,14 @@ https://stackoverflow.com/questions/50521031/how-to-get-the-users-name-in-telegr
 Telebot Doc - https://pypi.org/project/pyTelegramBotAPI/
 https://pynative.com/python-sqlite-insert-into-table/#h-using-python-variables-in-sqlite-insert-query
 https://stackoverflow.com/questions/63299057/telegram-bot-push-users-to-use-buttons-if-a-user-uses-test-message
+https://stackoverflow.com/questions/51611532/how-to-get-chat-id-and-message-id-in-telebotpytelegrambotapi-to-update-last-se
+https://habr.com/ru/post/580408/
+
+ФЛАЙТЫ
+
+1. Лера, до 13:00 СР.
+
+- Потестировать time.time с секундомером
+- Писать в базу данных: date, id, answer, correct/incorrect, start_time, end_time, duration
+- Выдавать юзеру из БД по команде /statistics: количество задач, количество верных ответов, доля верных, среднее время на решение
+- Продумать отбивки/обработчики на ошибки типа "Нет задачи на сегодняшний день"
