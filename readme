@@ -31,3 +31,5 @@ https://habr.com/ru/post/580408/
 - Писать в базу данных: date, id, answer, correct/incorrect, start_time, end_time, duration
 - Выдавать юзеру из БД по команде /statistics: количество задач, количество верных ответов, доля верных, среднее время на решение
 - Продумать отбивки/обработчики на ошибки типа "Нет задачи на сегодняшний день"
+
+https://www.geeksforgeeks.org/inserting-variables-to-database-table-using-python/
