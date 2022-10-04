@@ -1,5 +1,6 @@
 from pprint import pprint
 import pandas as pd
+import numpy as np
 import telebot
 from telebot import types
 import datetime, time
@@ -23,31 +24,50 @@ def current_date_task_data(current_date):
 
     return current_task_row
 
-# Welcome message
+#About nessage
 @bot.message_handler(commands=['start'])
 def start_button(message):
+    ab = pd.read_csv('about.csv', sep=';')
+    text = ab['about'][0]
+    # Reply to user
+    bot.send_message(message.chat.id, text=text)
+
+@bot.message_handler(commands=['help'])
+def help_button(message):
+    ab = pd.read_csv('about.csv', sep=';')
+    text = ab['help'][0]
+    # Reply to user
+    bot.send_message(message.chat.id, text=text)
+
+# Welcome message
+@bot.message_handler(commands=['task'])
+def task_button(message):
     start_time = int(time.time())
 
     # Get today task
     current_date = datetime.datetime.utcfromtimestamp(message.date).date()
     current_task = current_date_task_data(current_date)['task']
-    bot.send_message(message.chat.id, current_task)
+    #Проверяем, есть ли на сегодня задача
+    if current_task.empty:
+        bot.send_message(message.chat.id, text = "На сегодня нет задач.")
+    else:
+        bot.send_message(message.chat.id, current_task)
 
-    callback_data_list = [str(i) + '|' + str(start_time) for i in range(1, 5)]
+        callback_data_list = [str(i) + '|' + str(start_time) for i in range(1, 5)]
 
-    # Buttons
-    keyboard = types.InlineKeyboardMarkup()
-    button_one = types.InlineKeyboardButton('1', callback_data=callback_data_list[0])
-    button_two = types.InlineKeyboardButton('2', callback_data=callback_data_list[1])
-    button_three = types.InlineKeyboardButton('3', callback_data=callback_data_list[2])
-    button_four = types.InlineKeyboardButton('4', callback_data=callback_data_list[3])
-    keyboard.add(button_one)
-    keyboard.add(button_two)
-    keyboard.add(button_three)
-    keyboard.add(button_four)
+        # Buttons
+        keyboard = types.InlineKeyboardMarkup()
+        button_one = types.InlineKeyboardButton('1', callback_data=callback_data_list[0])
+        button_two = types.InlineKeyboardButton('2', callback_data=callback_data_list[1])
+        button_three = types.InlineKeyboardButton('3', callback_data=callback_data_list[2])
+        button_four = types.InlineKeyboardButton('4', callback_data=callback_data_list[3])
+        keyboard.add(button_one)
+        keyboard.add(button_two)
+        keyboard.add(button_three)
+        keyboard.add(button_four)
 
-    # Reply to user
-    bot.send_message(message.chat.id, text='Выбери вариант ответа', reply_markup=keyboard)
+        # Reply to user
+        bot.send_message(message.chat.id, text='Выбери вариант ответа', reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: True)

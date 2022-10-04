@@ -25,7 +25,7 @@ create_answer_table = """
 # c.close()
 # conn.close()
 
-# Check answer table
+Check answer table
 
 query = """
     SELECT * FROM users_info
