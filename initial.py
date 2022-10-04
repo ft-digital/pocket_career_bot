@@ -31,7 +31,7 @@ query = """
     SELECT * FROM users_info
 """
 c.execute(query)
-print(c.fetchall())
+pprint(c.fetchall())
 conn.commit()
 c.close()
 conn.close()
