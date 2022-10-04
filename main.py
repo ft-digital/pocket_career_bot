@@ -34,7 +34,6 @@ def start_button(message):
     bot.send_message(message.chat.id, current_task)
 
     callback_data_list = [str(i) + '|' + str(start_time) for i in range(1, 5)]
-    pprint(callback_data_list)
 
     # Buttons
     keyboard = types.InlineKeyboardMarkup()
@@ -48,46 +47,26 @@ def start_button(message):
     keyboard.add(button_four)
 
     # Reply to user
-    pprint(current_task)
-
     bot.send_message(message.chat.id, text='Выбери вариант ответа', reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def longname(call):
-    # Подключаемся к ДБ
-    conn = sqlite3.connect('users_info.db')
-    c = conn.cursor()
 
-    # Функция создания таблицы с данными пользователей
-    def create_table():
-        c.execute(
-            'CREATE TABLE IF NOT EXISTS users_info (user_id INT, date TEXT, us_answer INT, is_correct INT, start_time TEXT, end_time TEXT, duration INT)')
-
-    # Функция записи данных в таблицу users
-    def data_entry():
-        c.execute('INSERT INTO users_info (user_id, date, us_answer, is_correct, start_time, end_time, duration) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            (user_id, date, us_answer, is_correct, start_time, end_time, duration))
-        conn.commit()
-
+    # Берем время начала и ответ юзера переданные в callback с предыдущего шага
     start_time = int(call.data.split("|")[1])
     answer = call.data.split("|")[0]
+    # Берем ID чата и время нажатия на кнопку
     cid = call.message.chat.id
     end_time = int(time.time())
+
+    # Берем инфу из таблицы с задачами про сегодняшнюю дату: правильный ответ, отбивку для верного, отбивку для неверного
     current_date = datetime.datetime.utcfromtimestamp(call.message.date).date()
     current_correct = str(list(current_date_task_data(current_date)['correct'])[0])
     current_is_correct = list(current_date_task_data(current_date)['is_correct'])[0]
     current_is_incorrect = list(current_date_task_data(current_date)['is_incorrect'])[0]
 
-    bot.send_message(cid, call.data)
-    bot.send_message(cid, end_time)
-    duration = end_time - start_time
-    message_duration = "Время решения задачи составило: {time} секунд".format(time=str(duration))
-    bot.send_message(cid, message_duration)
-
-    print(call.data)
-    print(current_correct)
-    print(call.data == current_correct)
+    # Проверяем и отправляем соответствующее сообщение
 
     if answer == current_correct:
         bot.send_message(cid, current_is_correct)
@@ -96,15 +75,22 @@ def longname(call):
         bot.send_message(cid, current_is_incorrect)
         is_correct = 0
 
-    #Записываем данные в таблицу
+    # Считаем сколько времени ушло на решение задачи и сообщаем пользователю
+    duration = end_time - start_time
+    message_duration = "Время решения задачи составило: {time} секунд".format(time=str(duration))
+    bot.send_message(cid, message_duration)
 
-    user_id = cid
-    date = current_date
-    us_answer = answer
+    #Записываем данные в таблицу в БД на сервере
 
-    data_entry()
+    conn = sqlite3.connect('users_info.db')
+    c = conn.cursor()
+    c.execute(
+        'INSERT INTO users_info (tg_id, date, us_answer, is_correct, start_time, end_time, duration) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        (cid, current_date, answer, is_correct, start_time, end_time, duration))
+    conn.commit()
     c.close()
     conn.close()
+
 
 #Statistics message
 @bot.message_handler(commands=['stats'])
@@ -116,37 +102,33 @@ def stats_button(message):
 
     # Задачи
     def get_right_answers(us_id):
-        query = """
-        SELECT is_correct FROM users_info
-        WHERE user_id LIKE '%{tg_id}%'
+
+        sum_query = """
+                SELECT SUM(is_correct) FROM users_info
+                WHERE tg_id LIKE '%{tg_id}%'
         """.format(tg_id=tg_id)
-        is_right = c.execute(query)
+        sum_right = c.execute(sum_query).fetchall()[0][0]
+        print(sum_right)
 
-        sum_right = 0
-        for point in is_right:
-            sum_right += point[0]
-        len_tasks = len(is_right.fetchall())
+        len_query = """
+                SELECT COUNT(is_correct) FROM users_info
+                WHERE tg_id LIKE '%{tg_id}%'
+        """.format(tg_id=tg_id)
+        len_tasks = c.execute(len_query).fetchall()[0][0]
 
-        return (sum_right, len_tasks)
+        return sum_right, len_tasks
 
     task_message = "Правильно решенных задач: " + str(get_right_answers(tg_id)[0]) + "\n\n" + "Всего задач: " + str(get_right_answers(tg_id)[1])
 
     # Время
     def get_av_time(us_id):
         query = """
-        SELECT duration FROM users_info
-        WHERE user_id LIKE '%{tg_id}%'
+        SELECT AVG(duration) FROM users_info
+        WHERE tg_id LIKE '%{tg_id}%'
         """.format(tg_id=tg_id)
-        dur = c.execute(query)
+        avg_dur = c.execute(query).fetchall()[0][0]
 
-        sum_dur = 0
-        for sec in dur:
-            sum_dur += sec[0]
-
-        return sum_dur
-        # return (sum_dur / dur.count())
-
-
+        return avg_dur
 
     av_time_message = "\n\n" + "Среднее время на решение одной задачи: " + str(get_av_time(tg_id))
     stats_message = task_message + av_time_message
