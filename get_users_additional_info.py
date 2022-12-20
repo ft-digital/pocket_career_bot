@@ -17,8 +17,6 @@ for file in input_files:
     else:
         print('No correct files in input folder!')
 
-# pprint(events_df.info())
-
 # Get first event date for user
 
 events_for_first_count = ['start', 'get_task', 'answer']
@@ -49,3 +47,17 @@ for event in events_for_last_count:
     last_event_df = last_event_df.drop(columns=['timestamp'])
     last_event_dfs[event] = last_event_df
     pprint(last_event_df.head())
+
+
+# To CSV
+
+output_files_folder = os.path.abspath('output/')
+filenames_dfs = {
+    'user_first_events.csv': first_events,
+    'user_last_events.csv': last_event_df
+}
+
+for filename, df in filenames_dfs.items():
+    full_filename = output_files_folder + '/' + filename
+    df.to_csv(full_filename)
+
